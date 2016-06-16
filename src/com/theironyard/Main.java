@@ -38,6 +38,21 @@ public class Main {
         return users;
     }
 
+    public static void updateUser(Connection conn, User reg) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("UPDATE registrations SET username=?, address=?, email=? WHERE id=?");
+        stmt.setString(1, reg.username);
+        stmt.setString(2, reg.address);
+        stmt.setString(3, reg.email);
+        stmt.setInt(4, reg.id);
+        stmt.execute();
+    }
+
+    public static void deleteUser(Connection conn, int id) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM registrations WHERE id = ?");
+        stmt.setInt(1, id);
+        stmt.execute();
+    }
+
     public static void main(String[] args) throws SQLException {
         Server.createWebServer().start();
         Connection conn = DriverManager.getConnection("jdbc:h2:./main");
@@ -47,23 +62,45 @@ public class Main {
         Spark.init();
 
         Spark.get(
-                "/get-messages",
+                "/user",
                 (request, response) -> {
-                    ArrayList<User> users = selectUsers(conn);
+                    ArrayList<User> regs = selectUsers(conn);
                     JsonSerializer s = new JsonSerializer();
-                    return s.serialize(users);
+                    return s.serialize(regs);
                 }
         );
 
         Spark.post(
-                "/add-message",
+                "/user",
                 (request, response) -> {
                     String body = request.body();
                     JsonParser p = new JsonParser();
-                    User user = p.parse(body, User.class);
-                    insertUsers(conn, user.username, user.address, user.email);
+                    User reg = p.parse(body, User.class);
+                    insertUsers(conn, reg.username, reg.address, reg.email);
                     return "";
                 }
         );
+
+        Spark.put(
+                "/user",
+                (request, response) -> {
+                    String body = request.body();
+                    JsonParser p = new JsonParser();
+                    User reg = p.parse(body, User.class);
+                    updateUser(conn, reg);
+                    return "";
+                }
+        );
+
+        Spark.delete(
+                "/user/:id",
+                (request, response) -> {
+                    int id = Integer.valueOf(request.params("id"));
+                    deleteUser(conn, id);
+                    return"";
+                }
+        );
+
+
     }
 }
