@@ -38,12 +38,12 @@ public class Main {
         return users;
     }
 
-    public static void updateUser(Connection conn, User reg) throws SQLException {
+    public static void updateUser(Connection conn, User user) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("UPDATE registrations SET username=?, address=?, email=? WHERE id=?");
-        stmt.setString(1, reg.username);
-        stmt.setString(2, reg.address);
-        stmt.setString(3, reg.email);
-        stmt.setInt(4, reg.id);
+        stmt.setString(1, user.username);
+        stmt.setString(2, user.address);
+        stmt.setString(3, user.email);
+        stmt.setInt(4, user.id);
         stmt.execute();
     }
 
@@ -75,8 +75,8 @@ public class Main {
                 (request, response) -> {
                     String body = request.body();
                     JsonParser p = new JsonParser();
-                    User reg = p.parse(body, User.class);
-                    insertUsers(conn, reg.username, reg.address, reg.email);
+                    User user = p.parse(body, User.class);
+                    insertUsers(conn, user.username, user.address, user.email);
                     return "";
                 }
         );
@@ -86,8 +86,8 @@ public class Main {
                 (request, response) -> {
                     String body = request.body();
                     JsonParser p = new JsonParser();
-                    User reg = p.parse(body, User.class);
-                    updateUser(conn, reg);
+                    User user = p.parse(body, User.class);
+                    updateUser(conn, user);
                     return "";
                 }
         );
