@@ -39,7 +39,7 @@ public class Main {
     }
 
     public static void updateUser(Connection conn, User user) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("UPDATE registrations SET username=?, address=?, email=? WHERE id=?");
+        PreparedStatement stmt = conn.prepareStatement("UPDATE users SET username=?, address=?, email=? WHERE id=?");
         stmt.setString(1, user.username);
         stmt.setString(2, user.address);
         stmt.setString(3, user.email);
@@ -48,7 +48,7 @@ public class Main {
     }
 
     public static void deleteUser(Connection conn, int id) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("DELETE FROM registrations WHERE id = ?");
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM users WHERE id = ?");
         stmt.setInt(1, id);
         stmt.execute();
     }
